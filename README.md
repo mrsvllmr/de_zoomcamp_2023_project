@@ -1,7 +1,7 @@
-# Data Engineering Zoomcamp 2023 - The End and Harvest
+# Data Engineering Zoomcamp 2023 - The harvest
 This repository is an image of my first end-to-end data engineering project at the end of de-zoomcamp 2023. <br>
 
-**Thank you very much to all who offer this well-structured and very practical and thus equally instructive course free of charge!**
+**Thank you very much to all who offer this well-structured and very practical and thus equally instructive course free of charge!** :raised_hands:
 
 [Shoutout to DataTalksClub](https://www.youtube.com/@DataTalksClub) <br>
 [de-zoomcamp 2023](https://www.youtube.com/watch?v=-zpVha7bw5A&list=PL3MmuxUbc_hJjEePXIdE-LVUx_1ZZjYGW) <br>
@@ -31,7 +31,7 @@ This project combines my lifelong hobby and professional goal by sourcing, proce
 The project is based on the following technologies (which are also used in the de-zoomcamp 2023, in case you happen to find out about it here and would like to take a look at the extensive material):
 - **Cloud platform** (Virtual Machine, Storage/Datalake, Warehouse, Visualization): GCP
 - **Infrastructure as code (IaC)**: Terraform
-- **Batch processing**: to be specified
+- **Batch processing**: Python/Pandas
 - **Data warehouse**: Google Big Query
 - **Data transformation**: dbt
 - **Workflow orchestration**: Prefect
@@ -115,23 +115,52 @@ Cloud Infrastructure
 3. Install Google SDK (locally) (https://cloud.google.com/sdk/docs/install-sdk?hl=de#windows; see PowerShell command; set path variable to bin folder) <br>
     -> Google SDK will be used to communicate via cli
 
-4. Set GOOGLE_APPLICATION_CREDENTIALS environment variable: 
-    - ```export GOOGLE_APPLICATION_CREDENTIALS="<path/to/your/service-account-authkeys>.json"``` (Linux)
-    - ```set GOOGLE_APPLICATION_CREDENTIALS="<path/to/your/service-account-authkeys>.json"``` (Windows)
+4. Create SSH Key (which will be used to connect to the VM after its creation)
+    - create a directory as follows: ```C:/Users/{your user}/.ssh``` on your local machine (if you do not follow the pattern/path, you have to adjust the Terraform script accordingly)
+    - run one of the following cli commands (depending on your os) to create a private and a public key file (adjust KEY_FILENAME and USERNAME as needed) and store them in the newly created folder
+        - ```ssh-keygen -t rsa -f ~/.ssh/KEY_FILENAME -C USERNAME -b 2048``` (Linux)
+        - ```ssh-keygen -t rsa -f C:\Users\WINDOWS_USER\.ssh\KEY_FILENAME -C USERNAME -b 2048``` (Windows) <br>
+    (for details see [official GCP docs](https://cloud.google.com/compute/docs/connect/create-ssh-keys?hl=de))
 
-5. Activate Service Account Credentials: 
-    - ```gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS``` (Linux)
-    - ```gcloud auth activate-service-account --key-file %GOOGLE_APPLICATION_CREDENTIALS%``` (Windows)
+5. Set GOOGLE_APPLICATION_CREDENTIALS environment variable:
+    - run one of the following commands (depending on your os)
+        - ```export GOOGLE_APPLICATION_CREDENTIALS="<path/to/your/service-account-authkeys>.json"``` (Linux)
+        - ```set GOOGLE_APPLICATION_CREDENTIALS="<path/to/your/service-account-authkeys>.json"``` (Windows)
 
-6. Set variables as needed/wanted:
-    - mandatory(!): "project" variable default in variables.tf (and description, so your resources won't be associated with me ;))
+6. Activate Service Account Credentials: 
+    - run one of the following commands (depending on your os)
+        - ```gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS``` (Linux)
+        - ```gcloud auth activate-service-account --key-file %GOOGLE_APPLICATION_CREDENTIALS%``` (Windows)
 
-7. Initialize Terraform (within the directory where the tf files are saved): ```terraform init```
+7. Set variables as needed/wanted:
+    - mandatory(!): "project" variable default in variables.tf (and description, so your resources won't be associated with me :stuck_out_tongue_winking_eye:)
 
-8. Generate execution plan: ```terraform plan```
+8. Initialize Terraform (within the directory where the tf files are saved): ```terraform init```
 
-9. Apply the changes and let Terraform perform the actions in GCP: ```terraform apply```
+9. Generate execution plan: ```terraform plan```
 
+10. Apply the changes and let Terraform perform the actions in GCP: ```terraform apply```
+    - if asked, add GCP project ID again ([see this video of dezoomcamp course; corresponding timestamp is set, just follow the link](https://youtu.be/dNkEgO-CExg&t=15m20s))
+    - fyi: 
+        - The command will 
+            - create a data lake bucket
+            - create a BigQuery dataset
+            - create a compute instance/virtual machine (incl. Ubuntu and SSH enabling)
+            - enable Google/IAM APIs
+            - create a Service Account
+            - create a IAM Member (incl. roles assignments: Owner, BigQuery Admin, Storage Admin, Storage Object Admin)
+        - All these steps can also be done via GCP GUI. I have chosen the code-based way to show this possibility. Moreover, this is exactly the use case of Terraform, to create infrastructure via code and thus also to make it versionable.
+
+
+11. Create SSH connection to the newly created VM
+    - create a file called ```.config``` within the same directory and paste the following information (of course once again adjusted to your data):
+    ```
+    Host de-zoomcamp
+        HostName 34.140.195.121 # add external IP of the newly created VM (GCP > Compute Engine > VM instances)
+        User mrsvllmr # if unchanged gcp_user, otherwise adjust accordingly (variable gce_ssh_user)
+        IdentityFile c:/users/mariu/.ssh/gcp # if needed adjust accordingly (variable gce_ssh_pub_key_file)
+    ```
+    
 > wip - will be supplemented step by step; until then, this note remains in place
 
 <br>
