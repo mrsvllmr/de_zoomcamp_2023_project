@@ -1,4 +1,4 @@
-# creates GCP resources within the GCP
+# creates GCP resources within the GCP and enables SSH/adds SSH key to the instance
 
 terraform {
   required_version = ">= 1.0"
@@ -52,8 +52,8 @@ resource "google_bigquery_dataset" "dataset" {
 }
 
 resource "google_compute_instance" "instance" {
-  name         = "de-zoomcamp-2023-project-vm"
-  machine_type = "e2-standard-4"
+  name         = var.instance
+  machine_type = var.machine_type
   zone         = var.zone
   project      = var.project
 
@@ -69,5 +69,9 @@ resource "google_compute_instance" "instance" {
     access_config {
       network_tier = "PREMIUM"
     }
+  }
+
+  metadata = {
+    sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
   }
 }

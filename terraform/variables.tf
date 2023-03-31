@@ -1,16 +1,24 @@
 locals {
-  data_lake_bucket = "de-zoomcamp-2023-project-datalake-bucket"
+  data_lake_bucket = "de-zoomcamp-2023-project-datalake-bucket" # adjust accordingly if wanted
 }
 
 variable "project" {
-  description = "Final dezoomcamp project, cohort 2023, by Marius Vollmer"
-  default = "bright-aloe-381618"
+  description = "Final dezoomcamp project, cohort 2023, by mrsvllmr" # adjust accordingly!
+  default = "bright-aloe-381618" # adjust accordingly!
   type = string
+}
+
+variable "gce_ssh_user" {
+  default = "gcp_user" # adjust accordingly!
+}
+
+variable "gce_ssh_pub_key_file" {
+  default = "C:/Users/mariu/.ssh/gcp.pub" # adjust accordingly!
 }
 
 variable "region" {
   description = "Region for GCP resources"
-  default="EUROPE-WEST1"
+  default="EUROPE-WEST1" 
   type = string
 }
 
@@ -27,7 +35,7 @@ variable "BQ_DATASET" {
 
 variable "instance" {
   type = string
-  default = "de-zoomcamp-2023-project-vm"
+  default = "de-zoomcamp-2023-project-vm-sshtest"
 }
 
 variable "machine_type" {
@@ -39,4 +47,16 @@ variable "zone" {
   description = "Region for VM"
   type = string
   default = "europe-west1-b"
+}
+
+variable "gcp_service_list" {
+  type        = list(string)
+  description = "The list of apis necessary for the project"
+  default     = ["iam.googleapis.com","iamcredentials.googleapis.com"]
+}
+
+variable "roles" {
+  type        = list(string)
+  description = "The roles that will be granted to the service account."
+  default     = ["roles/owner","roles/storage.admin","roles/storage.objectAdmin","roles/bigquery.admin"]
 }
