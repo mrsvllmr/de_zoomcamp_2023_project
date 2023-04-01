@@ -1,5 +1,5 @@
 locals {
-  data_lake_bucket = "de-zoomcamp-2023-project-datalake-bucket" # adjust accordingly if wanted
+  data_lake_bucket = "de-zoomcamp-2023-project-datalake-bucket"
 }
 
 variable "project" {
@@ -9,7 +9,7 @@ variable "project" {
 }
 
 variable "gce_ssh_user" {
-  default = "gcp_user" # adjust accordingly!
+  default = "gcp_user"
 }
 
 variable "gce_ssh_pub_key_file" {

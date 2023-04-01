@@ -13,7 +13,7 @@ resource "google_project_iam_member" "sa_iam" {
 
   project = var.project
   role    = each.value
-  member  = "serviceAccount:${google_service_account.de-zoomcamp-2023-project-sa-id.email}"
+  member  = "serviceAccount:${google_service_account.de-zoomcamp-2023-project-sa-id.email}" # notice: inner part has to fit the account_id above
 
   depends_on = [
     google_project_service.enabled_apis,
