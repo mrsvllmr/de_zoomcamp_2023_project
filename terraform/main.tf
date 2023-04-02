@@ -1,56 +1,6 @@
-# creates GCP resources within the GCP and enables SSH/adds SSH key to the instance
-
-terraform {
-  required_version = ">= 1.0"
-  backend "local" {}  # Can change from "local" to "gcs" (for google) or "s3" (for aws), if you would like to preserve your tf-state online
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-    }
-  }
-}
-
-provider "google" {
-  project = var.project
-  region = var.region
-  // credentials = file(var.credentials)  # Use this if you do not want to set env-var GOOGLE_APPLICATION_CREDENTIALS
-}
-
-# Data Lake Bucket
-# Ref: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket
-resource "google_storage_bucket" "data-lake-bucket" {
-  name          = "${local.data_lake_bucket}_${var.project}" # Concatenating DL bucket & Project name for unique naming
-  location      = var.region
-  project       = var.project
-
-  # Optional, but recommended settings:
-  storage_class = var.storage_class
-  uniform_bucket_level_access = true
-
-  versioning {
-    enabled     = true
-  }
-
-  lifecycle_rule {
-    action {
-      type = "Delete"
-    }
-    condition {
-      age = 30  // days
-    }
-  }
-
-  force_destroy = true
-}
-
-# DWH
-# Ref: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigquery_dataset
-resource "google_bigquery_dataset" "dataset" {
-  dataset_id = var.BQ_DATASET
-  project    = var.project
-  location   = var.region
-}
-
+################################################################################################################################################
+# Virtual machine (incl. SSH and GC CLI authentication)
+################################################################################################################################################
 resource "google_compute_instance" "instance" {
   name         = var.instance
   machine_type = var.machine_type
@@ -74,4 +24,70 @@ resource "google_compute_instance" "instance" {
   metadata = {
     sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
   }
+
+  # # Use the service account to authenticate the GC cli
+  # metadata_startup_script = <<-SCRIPT
+  #   # Create the directory for the service account key file
+  #   mkdir -p /home/gcp_user/.gc && touch /home/gcp_user/.gc/sa_key_file.json
+    
+  #   # Write the service account key file
+  #   echo "${google_service_account_key.de-zoomcamp-2023-project-sa-key.private_key}" > /home/gcp_user/.gc/sa_key_file.json
+    
+  #   # make files visible
+  #   ls -a
+
+  #   # Set the GOOGLE_APPLICATION_CREDENTIALS environment variable
+  #   export GOOGLE_APPLICATION_CREDENTIALS=/home/gcp_user/.gc/sa_key_file.json
+    
+  #   # Authenticate the GC cli
+  #   gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
+  # SCRIPT
+
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = var.gce_ssh_user
+      host        = google_compute_instance.instance.network_interface[0].access_config[0].nat_ip
+      private_key = file(var.gce_ssh_priv_key_file)
+    }
+    inline = [
+      # "sudo apt-add-repository -r ppa:gnome3-team/gnome3",
+      # "sudo apt-add-repository -r ppa:philip.scott/spice-up-daily",
+      "sudo apt-get update",
+      # "sudo apt-get install -y docker.io",
+      # "sudo groupadd docker",
+      # "sudo gpasswd -a $USER docker",
+      # "sudo service docker restart",
+      # "sudo systemctl start docker",
+      # "sudo systemctl enable docker",
+      # "cd ~",
+      # "mkdir bin",
+      # "cd ~/bin",
+      # "wget https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -O docker-compose",
+      # # "sudo apt-get install -y docker-compose"
+      # "chmod +x docker-compose",
+      # "docker-compose up -d"
+      "sudo apt-get install git",
+      "git clone https://github.com/mrsvllmr/de_zoomcamp_2023_project.git",
+      "sudo apt-get install wget",
+      "wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh"
+    ]
+  }
 }
+
+################################################################################################################################################
+# Docker compose visibility
+################################################################################################################################################
+# make Docker Compose visible from every directory
+# resource "null_resource" "add_bin_to_path" {
+#   provisioner "file" {
+#     content = "export PATH=\"${HOME}/bin:${PATH}\""
+#     destination = "~/.bashrc"
+#     connection {
+#       type     = "ssh"
+#       user     = var.gce_ssh_user
+#       host     = var.instance
+#       private_key = file(var.gce_ssh_priv_key_file)
+#     }
+#   }
+# }

@@ -13,7 +13,11 @@ variable "gce_ssh_user" {
 }
 
 variable "gce_ssh_pub_key_file" {
-  default = "C:/Users/mariu/.ssh/gcp.pub" # adjust accordingly!
+  default = "C:/Users/mariu/.ssh/ssh_key.pub" # adjust accordingly!
+}
+
+variable "gce_ssh_priv_key_file" {
+  default = "C:/Users/mariu/.ssh/ssh_key" # adjust accordingly!
 }
 
 variable "region" {
