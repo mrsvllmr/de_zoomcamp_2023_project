@@ -9,7 +9,7 @@ variable "project" {
 }
 
 variable "gce_ssh_user" {
-  default = "gcp_user"
+  default = "mrsvllmr"
 }
 
 variable "gce_ssh_pub_key_file" {
@@ -63,4 +63,9 @@ variable "roles" {
   type        = list(string)
   description = "The roles that will be granted to the service account."
   default     = ["roles/owner","roles/storage.admin","roles/storage.objectAdmin","roles/bigquery.admin"]
+}
+
+variable "github_pat" {
+  type        = string
+  default     = "C:/Users/mariu/.github/pat" # adjust accordingly!
 }

@@ -68,7 +68,8 @@ resource "google_compute_instance" "instance" {
       # "chmod +x docker-compose",
       # "docker-compose up -d"
       "sudo apt-get install git",
-      "git clone https://github.com/mrsvllmr/de_zoomcamp_2023_project.git",
+      # "git clone https://github.com/mrsvllmr/de_zoomcamp_2023_project.git",
+      "git clone https://mrsvllmr:${var.github_pat}@github.com/mrsvllmr/de_zoomcamp_2023_project.git",
       "sudo apt-get install wget",
       "wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh"
     ]

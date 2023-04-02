@@ -16,3 +16,7 @@ provider "google" {
   region = var.region
   // credentials = file(var.credentials)  # Use this if you do not want to set env-var GOOGLE_APPLICATION_CREDENTIALS
 }
+
+provider "github" {
+  default = "C:/Users/mariu/.github/pat" # adjust accordingly!
+}
