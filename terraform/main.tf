@@ -25,23 +25,23 @@ resource "google_compute_instance" "instance" {
     sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
   }
 
-  # # Use the service account to authenticate the GC cli
-  # metadata_startup_script = <<-SCRIPT
-  #   # Create the directory for the service account key file
-  #   mkdir -p /home/gcp_user/.gc && touch /home/gcp_user/.gc/sa_key_file.json
+  # Use the service account to authenticate the GC cli
+  metadata_startup_script = <<-SCRIPT
+    # Create the directory for the service account key file
+    mkdir -p /home/mrsvllmr/.gc && touch /home/mrsvllmr/.gc/sa_key_file.json
     
-  #   # Write the service account key file
-  #   echo "${google_service_account_key.de-zoomcamp-2023-project-sa-key.private_key}" > /home/gcp_user/.gc/sa_key_file.json
+    # Write the service account key file
+    echo "${google_service_account_key.de-zoomcamp-2023-project-sa-key}" > /home/mrsvllmr/.gc/sa_key_file.json
     
-  #   # make files visible
-  #   ls -a
+    # make files visible
+    ls -a
 
-  #   # Set the GOOGLE_APPLICATION_CREDENTIALS environment variable
-  #   export GOOGLE_APPLICATION_CREDENTIALS=/home/gcp_user/.gc/sa_key_file.json
+    # Set the GOOGLE_APPLICATION_CREDENTIALS environment variable
+    export GOOGLE_APPLICATION_CREDENTIALS=/home/mrsvllmr/.gc/sa_key_file.json
     
-  #   # Authenticate the GC cli
-  #   gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
-  # SCRIPT
+    # Authenticate the GC cli
+    gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
+  SCRIPT
 
   provisioner "remote-exec" {
     connection {
@@ -53,7 +53,6 @@ resource "google_compute_instance" "instance" {
     inline = [
       # "sudo apt-add-repository -r ppa:gnome3-team/gnome3",
       # "sudo apt-add-repository -r ppa:philip.scott/spice-up-daily",
-      "sudo apt-get update",
       # "sudo apt-get install -y docker.io",
       # "sudo groupadd docker",
       # "sudo gpasswd -a $USER docker",
@@ -67,11 +66,42 @@ resource "google_compute_instance" "instance" {
       # # "sudo apt-get install -y docker-compose"
       # "chmod +x docker-compose",
       # "docker-compose up -d"
-      "sudo apt-get install git",
-      # "git clone https://github.com/mrsvllmr/de_zoomcamp_2023_project.git",
-      "git clone https://mrsvllmr:${var.github_pat}@github.com/mrsvllmr/de_zoomcamp_2023_project.git",
+
+      # "sudo apt-get update",
+      # "sudo apt-get install git",
+      # # "git clone https://github.com/mrsvllmr/de_zoomcamp_2023_project.git",
+      # "git clone https://mrsvllmr:${file(var.github_pat)}@github.com/mrsvllmr/de_zoomcamp_2023_project.git",
+      # "sudo apt-get install wget",
+      # "wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh",
+      # "cd /home/mrsvllmr/de_zoomcamp_2023_project",
+      # "conda create -n conda_venv",
+      # "conda activate conda-env",
+      # "conda install pip",
+      # "pip install -r requirements.txt"
+
+      # "git clone https://mrsvllmr:${file(var.github_pat)}@github.com/mrsvllmr/de_zoomcamp_2023_project.git",
+      # "sudo apt-get install wget",
+      # "wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh",
+      # "bash Anaconda3-2022.10-Linux-x86_64.sh -b -p /home/mrsvllmr/anaconda3",
+      # "export PATH=/home/mrsvllmr/anaconda3/bin:$PATH",
+      # "source /home/mrsvllmr/anaconda3/etc/profile.d/conda.sh",
+      # "conda create -y -n conda_venv python=3.9",
+      # "conda deactivate",
+      # "source /home/mrsvllmr/anaconda3/bin/activate conda_venv",
+      # "cd /home/mrsvllmr/de_zoomcamp_2023_project",
+      # "pip install -r requirements.txt"
+
+      "git clone https://mrsvllmr:${file(var.github_pat)}@github.com/mrsvllmr/de_zoomcamp_2023_project.git",
       "sudo apt-get install wget",
-      "wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh"
+      "wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh",
+      "bash Anaconda3-2022.10-Linux-x86_64.sh -b -p /home/mrsvllmr/anaconda3",
+      "export PATH=/home/mrsvllmr/anaconda3/bin:$PATH",
+      "source /home/mrsvllmr/anaconda3/etc/profile.d/conda.sh",
+      "conda create -y -n conda_venv python=3.9",
+      "export PATH=/home/mrsvllmr/anaconda3/envs/conda_venv/bin:$PATH",
+      "source activate conda_venv",
+      "cd /home/mrsvllmr/de_zoomcamp_2023_project",
+      "pip install -r requirements.txt"
     ]
   }
 }

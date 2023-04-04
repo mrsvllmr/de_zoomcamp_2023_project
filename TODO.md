@@ -20,6 +20,10 @@
 - [ ] Partition the data within BigQuery (clustering might not be necessary)
 - [ ] Check once again if all keys to be downloaded/uploaded are described correctly (no duplicates with commands etc.)
 - [ ] Next step: Spark (batch and/or streaming)
-- [ ] Check formerly added sections in README.md and compare to the new ones
+- [ ] Check formerly added sections in README.md and compare to the new ones (especially regarding ssh connection config file as it also contains an IdentityFile attribute)
+- [ ] Check ports in README.md (regarding config file for SSH)
+- [ ] Improvement: Run Terraform in Docker Compose (to have a consistent and reliable experience working with different projects; https://www.youtube.com/watch?v=nO_Px60YUKg)
+- [ ] Another alternative regarding working with GCP/authentication/connection (https://gcloud.devoteam.com/blog/a-step-by-step-guide-to-set-up-a-gcp-project-to-start-using-terraform/)
+- [ ] Install Anaconda, Docker etc. directly on the virtual machine via Terraform (nothing to do with Docker (Compose), correct!?)
 
 > Note to me: specify next time with regard to the steps already implemented

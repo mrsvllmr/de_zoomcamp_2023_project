@@ -1,4 +1,5 @@
-# used to build images
+# used to build images (which then later lead to an actual container)
+# process: Manifest/Dockerfile -> image -> container
 # uses the docker build command
 FROM python:3.9.1
 

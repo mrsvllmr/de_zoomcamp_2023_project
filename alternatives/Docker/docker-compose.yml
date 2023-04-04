@@ -1,0 +1,50 @@
+# Docker compose: Tool for defining and running multi-container Docker applications
+# used to run images as containers
+# uses the docker-compose up command
+
+# shoutout to https://medium.com/the-prefect-blog/how-to-self-host-prefect-orion-with-postgres-using-docker-compose-631c41ab8a9f
+version: "3.9"
+services:
+  ### PostgreSQL Database
+  database:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres # sets default user
+      - POSTGRES_PASSWORD=postgres # sets default password
+      - POSTGRES_DB=orion # sets default database
+    expose: # exposes ports to the host machine (and NOT other machines on the same Docker network)
+      - 5432
+    volumes: 
+      - postgres:/var/lib/postgresql/data # to make sure Postgres will keep all Prefect metadata
+
+  ### Prefect Orion API
+  orion:
+    image: prefecthq/prefect:2-python3.10
+    restart: always
+    volumes: # dockers way of providing persistend storage
+      - prefect:~.prefect # Prefect Orion stores its Postgres database here
+    entrypoint: ["prefect", "orion", "start"]
+    environment:
+      - PREFECT_ORION_API_HOST=0.0.0.0
+      - PREFECT_ORION_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:postgres@database:5432/orion
+    ports:
+      - 4200:4200 # shares port 4200 with the Docker host machine
+    depends_on:
+      - database # makes sure the database is set up before Prefect itself
+
+  ### dbt
+  dbt:
+    image: dbtlabs/dbt-bigquery:1.4.1
+    restart: always
+    volumes: # dockers way of providing persistend storage
+      - dbt:~.dbt
+    entrypoint:
+    environment:
+    ports:
+    depends_on:
+      
+volumes:
+  prefect:
+  postgres:
+  dbt:

@@ -1,8 +1,8 @@
-requests==2.28.2
+requests==2.28.2 # send HTTP/1.1 requests
 pandas==1.5.3
 pandas-gbq==0.19.1
-pathlib==1.0.1
-pyarrow==11.0.0
+pathlib==1.0.1 # send HTTP/1.1 requests
+pyarrow==11.0.0 # efficient large-scale data processing
 prefect==2.8.7
 prefect-gcp[cloud_storage]==0.3.0
 prefect-dbt[bigquery]==0.3.1
