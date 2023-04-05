@@ -1,0 +1,9 @@
+# prefect artifacts
+.prefectignore
+
+# Environments
+.python-version
+.env
+.venv
+env/
+venv/

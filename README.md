@@ -117,15 +117,19 @@ The following instructions are deliberately very detailed. This is not only to e
     - Afterwards you can connect to the virtual machine via cmd/bash by using ```ssh de-zoomcamp``` <br>
     (instead of ```ssh -i ~/.ssh/gcp de-zoomcamp```)
     
-12. (In case you use VS code and like to connect comfortably)
+12. Connect to VM (via VS Code and SSH)
     - In VS Code: Extensions -> Look for "remote ssh" -> Install "Remote-SSH"
     - Click "Open a Remote Window" (bottom left corner) -> Select "Connect to Host…" -> Select "de-zoomcamp" (which is available due to the fact that we have already configured/created the config file)
 
 13. Run ```gcloud iam service-accounts keys create ./home/mrsvllmr/.gc/sa_key_file.json --iam-account=sa-iam@$PROJECT_ID.iam.gserviceaccount.com```
 
-13. Start the Prefect server:
+14. Start the Prefect server:
     - Activate conda virtual environment: ```source /home/mrsvllmr/anaconda3/bin/activate conda_venv```
     - Start the Prefect server: ```prefect server start```
+
+15. Register Prefect blocks
+    - ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/blocks/gcp_blocks.py```
+    - ``` ```
 
 > wip - will be supplemented step by step; until then, this note remains in place
 

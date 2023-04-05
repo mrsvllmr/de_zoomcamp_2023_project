@@ -1,64 +1,108 @@
-#!/usr/bin/env python
-# coding: utf-8
-import os
-import argparse
-from time import time
+import requests
 import pandas as pd
-from sqlalchemy import create_engine
+import pyarrow as pa
+import pyarrow.parquet as pq
+import json
+import os
+import io
+import datetime
+import logging
+import gcsfs
+from google.cloud import storage
+from prefect import flow, task, get_run_logger
+from prefect_gcp.cloud_storage import GcsBucket
+from prefect.filesystems import GCS
+from prefect.deployments import Deployment
+from prefect.server.schemas.schedules import CronSchedule
 
 
-def ingest_data(user, password, host, port, db, table_name, url):
-    
-    # the backup files are gzipped, and it's important to keep the correct extension
-    # for pandas to be able to open the file
-    if url.endswith('.csv.gz'):
-        csv_name = 'yellow_tripdata_2021-01.csv.gz'
+@task(retries=3)
+def fetch(url: str) -> dict:
+    """Extract RKI data"""
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        return data
+
     else:
-        csv_name = 'output.csv'
-
-    os.system(f"wget {url} -O {csv_name}")
-    postgres_url = f'postgresql://{user}:{password}@{host}:{port}/{db}'
-    engine = create_engine(postgres_url)
-
-    df_iter = pd.read_csv(csv_name, iterator=True, chunksize=100000)
-
-    df = next(df_iter)
-
-    df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
-    df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
-
-    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
-
-    df.to_sql(name=table_name, con=engine, if_exists='append')
+        raise ValueError("Error retrieving data from API")
 
 
-    while True: 
+@task(retries=3)
+def write_json_to_gcs(data: dict) -> None:
+    """Save data to GCS in JSON format"""
+    # Convert the data to a JSON string
+    json_data = json.dumps(data)
 
-        try:
-            t_start = time()
-            
-            df = next(df_iter)
+    # Define file/object name
+    filename = f"ingest_{datetime.datetime.now().strftime('%Y%m%d')}.json"
+    object_name = f'{filename}'
 
-            df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
-            df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
+    # Create a file-like object that contains the JSON string
+    # shoutout to https://www.skytowner.com/explore/how_to_solve_the_error_attributeerror_str_object_has_no_attribute_tell_when_uploading_files_on_google_cloud_storage_in_python
+    file_obj = io.StringIO(json_data)
 
-            df.to_sql(name=table_name, con=engine, if_exists='append')
+    # Upload the file to GCS
+    gcs_block = GcsBucket.load("gcs-bucket")
+    gcs_block.upload_from_file_object(file_obj, object_name, content_type='application/json')
+    return
 
-            t_end = time()
 
-            print('inserted another chunk, took %.3f second' % (t_end - t_start))
+@flow()
+def rki_to_gcs() -> None:
+    """Main flow responsible for extracting the data from the RKI api and writing them to GCS bucket"""
 
-        except StopIteration:
-            print("Finished ingesting data into the postgres database")
-            break
+    # activate logger in order to print manual/custom logs to Prefect flow logs
+    logger = get_run_logger()
 
-if __name__ == '__main__':
-    user = "postgres"
-    password = "admin"
-    host = "localhost"
-    port = "5433"
-    db = "ny_taxi"
-    table_name = "yellow_taxi_trips"
-    csv_url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+    # API endpoint
+    url = "https://api.corona-zahlen.org/germany"
 
-    ingest_data(user, password, host, port, db, table_name, csv_url)
+    # Extract data from API
+    logger.info(
+        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+        f"Starting to extract the data from {url}\n"
+        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+        )
+    data_dict = fetch(url)
+    logger.info(
+        f"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+        "Extracting of data completed\n"
+        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+        )
+
+    # Write data to GCS
+    logger.info(
+        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+        f"Starting to write json data to GCS bucket {url}\n"
+        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+    )
+    write_json_to_gcs(data_dict, wait_for=data_dict)
+    logger.info(
+        f"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+        "Writing to GCS bucket completed\n"
+        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+    )
+
+
+def deploy_flow():
+    DEPLOY_STORE_NAME = "gcs-deployments"
+    storage = GCS.load("gcs-deployments")
+    print("THIS WORKED SO FAR")
+    deployment = Deployment.build_from_flow(
+        flow=rki_to_gcs,
+        name='rki2gcs',
+        description='Extracts data from RKI API in JSON format and writes them to the GCS bucket in JSON format',
+        version='20230405',
+        work_queue_name='default',
+        storage=storage,
+        tags=["ingest"],
+        #schedule=(CronSchedule(cron="5/30 * * * *", timezone="Europe/Berlin")),
+    )
+    deployment.apply
+
+
+if __name__ == "__main__":
+    # rki_to_gcs()
+    deploy_flow()

@@ -26,22 +26,22 @@ resource "google_compute_instance" "instance" {
   }
 
   # Use the service account to authenticate the GC cli
-  metadata_startup_script = <<-SCRIPT
-    # Create the directory for the service account key file
-    mkdir -p /home/mrsvllmr/.gc && touch /home/mrsvllmr/.gc/sa_key_file.json
-    
-    # Write the service account key file
-    echo "${google_service_account_key.de-zoomcamp-2023-project-sa-key}" > /home/mrsvllmr/.gc/sa_key_file.json
-    
-    # make files visible
-    ls -a
-
-    # Set the GOOGLE_APPLICATION_CREDENTIALS environment variable
-    export GOOGLE_APPLICATION_CREDENTIALS=/home/mrsvllmr/.gc/sa_key_file.json
-    
-    # Authenticate the GC cli
-    gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
-  SCRIPT
+  #metadata_startup_script = <<-SCRIPT
+  #  # Create the directory for the service account key file
+  #  mkdir -p /home/mrsvllmr/.gc && touch /home/mrsvllmr/.gc/sa_key_file.json
+  #  
+  #  # Write the service account key file
+  #  echo "${google_service_account_key.de-zoomcamp-2023-project-sa-key}" > /home/mrsvllmr/.gc/sa_key_file.json
+  #  
+  #  # make files visible
+  #  ls -a
+  #
+  #  # Set the GOOGLE_APPLICATION_CREDENTIALS environment variable
+  #  export GOOGLE_APPLICATION_CREDENTIALS=/home/mrsvllmr/.gc/sa_key_file.json
+  #  
+  #  # Authenticate the GC cli
+  #  gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
+  #SCRIPT
 
   provisioner "remote-exec" {
     connection {
@@ -93,6 +93,7 @@ resource "google_compute_instance" "instance" {
 
       "git clone https://mrsvllmr:${file(var.github_pat)}@github.com/mrsvllmr/de_zoomcamp_2023_project.git",
       "sudo apt-get install wget",
+      #"sudo apt-get install git",
       "wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh",
       "bash Anaconda3-2022.10-Linux-x86_64.sh -b -p /home/mrsvllmr/anaconda3",
       "export PATH=/home/mrsvllmr/anaconda3/bin:$PATH",
@@ -121,4 +122,9 @@ resource "google_compute_instance" "instance" {
 #       private_key = file(var.gce_ssh_priv_key_file)
 #     }
 #   }
+# }
+
+# resource "local_file" "de-zoomcamp-2023-project-sa-key-json" {
+#   filename = "/home/mrsvllmr/.gc/sa_key_file.json"
+#   content  = base64decode(google_service_account_key.de-zoomcamp-2023-project-sa-key.private_key)
 # }
