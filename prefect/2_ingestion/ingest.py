@@ -97,7 +97,7 @@ def deploy_flow():
         work_queue_name='default',
         storage=storage,
         tags=["ingest"],
-        #schedule=(CronSchedule(cron="5/30 * * * *", timezone="Europe/Berlin")),
+        schedule=(CronSchedule(cron="0 0 8 * * *", timezone="Europe/Berlin")),
     )
     deployment.apply()
 
