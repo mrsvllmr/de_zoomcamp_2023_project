@@ -89,7 +89,6 @@ def rki_to_gcs() -> None:
 def deploy_flow():
     DEPLOY_STORE_NAME = "gcs-deployments"
     storage = GCS.load("gcs-deployments")
-    print("THIS WORKED SO FAR")
     deployment = Deployment.build_from_flow(
         flow=rki_to_gcs,
         name='rki2gcs',

@@ -10,6 +10,7 @@ resource "google_compute_instance" "instance" {
   boot_disk {
     initialize_params {
       image = "ubuntu-os-cloud/ubuntu-2004-lts"
+      size = 25
     }
   }
 
@@ -91,7 +92,8 @@ resource "google_compute_instance" "instance" {
       # "cd /home/mrsvllmr/de_zoomcamp_2023_project",
       # "pip install -r requirements.txt"
 
-      "git clone https://mrsvllmr:${file(var.github_pat)}@github.com/mrsvllmr/de_zoomcamp_2023_project.git",
+      #"git clone https://mrsvllmr:${file(var.github_pat)}@github.com/mrsvllmr/de_zoomcamp_2023_project.git", # temporarily used when repo was private
+      "git clone https://github.com/mrsvllmr/de_zoomcamp_2023_project.git",
       "sudo apt-get install wget",
       #"sudo apt-get install git",
       "wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh",

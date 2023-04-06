@@ -121,15 +121,24 @@ The following instructions are deliberately very detailed. This is not only to e
     - In VS Code: Extensions -> Look for "remote ssh" -> Install "Remote-SSH"
     - Click "Open a Remote Window" (bottom left corner) -> Select "Connect to Host…" -> Select "de-zoomcamp" (which is available due to the fact that we have already configured/created the config file)
 
-13. Run ```gcloud iam service-accounts keys create ./home/mrsvllmr/.gc/sa_key_file.json --iam-account=sa-iam@$PROJECT_ID.iam.gserviceaccount.com```
+13. Transfer your service account JSON file to the VM (to be able to connect to GCP via service account/CLI)
+    - Create a folder /home/{your_user}/.gc/ (reminder: your_user is defined via gce_ssh_user variable in variables.tf)
+    - Save your sa-key-file.json within that directory (do not change the name!)
 
-14. Start the Prefect server:
+14. Set an environment variable and activate the service account authentication
+    - ```export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/sa-key-file.json```
+    - ```gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS```
+
+15. Start the Prefect server:
     - Activate conda virtual environment: ```source /home/mrsvllmr/anaconda3/bin/activate conda_venv```
     - Start the Prefect server: ```prefect server start```
 
-15. Register Prefect blocks
-    - ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/blocks/gcp_blocks.py```
-    - ``` ```
+16. Register Prefect blocks via ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/blocks/gcp_blocks.py```
+    - Creates a GCP Credentials block called gcp-credentials (used to authenticate when interacting with GCP)
+    - Creates a GCS block called gcp-deployments (used to save the deployments in GCP)
+    - Creates a GCS Bucket block called gcs-bucket (used to save the data in GCS)
+
+17. Run ```python /home/mrsvllmr/de_zoomcamp_2023_project/ingestion/ingest.py```
 
 > wip - will be supplemented step by step; until then, this note remains in place
 
