@@ -100,7 +100,7 @@ def deploy_flow():
         tags=["ingest"],
         #schedule=(CronSchedule(cron="5/30 * * * *", timezone="Europe/Berlin")),
     )
-    deployment.apply
+    deployment.apply()
 
 
 if __name__ == "__main__":
