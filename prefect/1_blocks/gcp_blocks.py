@@ -1,4 +1,6 @@
 from prefect_gcp import GcpCredentials
+from prefect_dbt.cli import BigQueryTargetConfigs, DbtCliProfile
+from prefect_gcp.credentials import GcpCredentials
 from prefect_gcp.cloud_storage import GcsBucket
 from prefect_gcp.cloud_storage import cloud_storage_create_bucket
 from prefect.filesystems import GCS
@@ -41,6 +43,27 @@ gcs_block = GCS(
 )
 
 gcs_block.save("gcs-deployments", overwrite=True)
+
+########################################################################################################
+# BigQueryTargetConfigs block
+########################################################################################################
+credentials = GcpCredentials.load("gcp-credentials")
+target_configs = BigQueryTargetConfigs(
+    schema="de_zoomcamp_2023_project_dataset",
+    credentials=credentials,
+)
+
+target_configs.save("bgtc", overwrite=True)
+
+########################################################################################################
+# DbtCliProfile block
+########################################################################################################
+dbt_cli_profile = DbtCliProfile(
+    name="dez-dbt-cli-profile",
+    target="dev",
+    target_configs=target_configs,
+)
+dbt_cli_profile.save("dez-dbt-cli-profile", overwrite=True)
 
 
 # if __name__ == '__main__':

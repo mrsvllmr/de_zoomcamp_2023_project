@@ -153,9 +153,26 @@ The following instructions are deliberately very detailed. This is not only to e
     - If you want to: Start a Quick Run via UI <br>
       -> Afterwards you will now find a data directory and the ingested json file within your GCS bucket :white_check_mark:
 
-19. dbt-bigquery authentication methode
-    I used the service-account method by referencing the json file in the .gc folder. The result of the configuration via CLI is the profiles.yml file.<br>
-    When reproducing, this file must therefore be adjusted accordingly.
+19. Initialize dbt project
+    - I used the service-account method by referencing the json file in the .gc folder. The result of the configuration via CLI is the profiles.yml in .dbt folder outside of the repo file.<br>
+    - Fyi, my profiles.yml looks like this:
+      ```yml
+      dez_dbt:
+        outputs:
+            dev:
+            dataset: de_zoomcamp_2023_project_dataset
+            job_execution_timeout_seconds: 300
+            job_retries: 1
+            keyfile: /home/mrsvllmr/.gc/sa-key-file.json
+            location: europe-west1
+            method: service-account
+            priority: interactive
+            project: bright-aloe-381618
+            threads: 1
+            type: bigquery
+        target: dev
+      ```
+      <span style="color:red">When reproducing, this file must therefore be adjusted accordingly!</span>
 
 20. 
 
