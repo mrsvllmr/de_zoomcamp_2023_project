@@ -1,0 +1,158 @@
+
+version: 2
+
+sources:
+  - name: rki
+    description: "Source data extraced from the RKI API endpoints"
+    database: bright-aloe-381618
+    schema: de_zoomcamp_2023_project_dataset
+    tables:
+      - name: districts
+        loader: bigquery
+      - name: germany
+        loader: bigquery
+      - name: hochsauerlandkreis
+        loader: bigquery
+
+models:
+  - name: districts
+    description: "Staging model for districts. Even if these data might not change that often, they get extracted from the RKI API on a daily basis."
+    columns:
+      - name: ags
+        description: "The primary key for this table"
+      - name: name
+        description: "The primary key for this table"
+      - name: country
+        description: "The primary key for this table"
+      - name: state
+        description: "The primary key for this table"
+      - name: population
+        description: "The primary key for this table"
+      - name: cases
+        description: "The primary key for this table"
+      - name: deaths
+        description: "The primary key for this table"
+      - name: casesPerWeek
+        description: "The primary key for this table"
+      - name: deathsPerWeek
+        description: "The primary key for this table"
+      - name: stateAbbreviation
+        description: "The primary key for this table"
+      - name: recovered
+        description: "The primary key for this table"
+      - name: weekIncidence
+        description: "The primary key for this table"
+      - name: casesPer100k
+        description: "The primary key for this table"
+      - name: delta_cases
+        description: "The primary key for this table"
+      - name: delta_deaths
+        description: "The primary key for this table"
+      - name: delta_recovered
+        description: "The primary key for this table"
+      - name: delta_weekIncidence
+        description: "The primary key for this table"
+
+  - name: germany
+    description: "Staging model for german Covid-19 data. The data get extracted from the RKI API on a daily basis."
+    columns:
+      - name: cases
+        description: "The primary key for this table"
+      - name: deaths
+        description: "The primary key for this table"
+      - name: recovered
+        description: "The primary key for this table"
+      - name: weekIncidence
+        description: "The primary key for this table"
+      - name: casesPer100k
+        description: "The primary key for this table"
+      - name: casesPerWeek
+        description: "The primary key for this table"
+      - name: deathsPerWeek
+        description: "The primary key for this table"
+      - name: delta_cases
+        description: "The primary key for this table"
+      - name: delta_deaths
+        description: "The primary key for this table"
+      - name: delta_recovered
+        description: "The primary key for this table"
+      - name: delta_weekIncidence
+        description: "The primary key for this table"
+      - name: r_value
+        description: "The primary key for this table"
+      - name: r_rValue4Days_value
+        description: "The primary key for this table"
+      - name: r_rValue4Days_date
+        description: "The primary key for this table"
+      - name: r_rValue7Days_value
+        description: "The primary key for this table"
+      - name: r_rValue7Days_date
+        description: "The primary key for this table"
+      - name: r_lastUpdate
+        description: "The primary key for this table"
+      - name: hospitalization_cases7Days
+        description: "The primary key for this table"
+      - name: hospitalization_incidence7Days
+        description: "The primary key for this table"
+      - name: hospitalization_date
+        description: "The primary key for this table"
+      - name: hospitalization_lastUpdate
+        description: "The primary key for this table"
+      - name: meta_source
+        description: "The primary key for this table"
+      - name: meta_contact
+        description: "The primary key for this table"
+      - name: meta_info
+        description: "The primary key for this table"
+      - name: meta_lastUpdate
+        description: "The primary key for this table"
+      - name: meta_lastCheckedForUpdate
+        description: "The primary key for this table"
+
+  - name: hochsauerlandkreis
+    description: "Staging model for Hochsauerlandkreis Covid-19 data. The data get extracted from the RKI API on a daily basis."
+    columns:
+      - name: data_05958_ags
+        description: "The primary key for this table"
+      - name: data_05958_name
+        description: "The primary key for this table"
+      - name: data_05958_county
+        description: "The primary key for this table"
+      - name: data_05958_state
+        description: "The primary key for this table"
+      - name: data_05958_population
+        description: "The primary key for this table"
+      - name: data_05958_cases
+        description: "The primary key for this table"
+      - name: data_05958_deaths
+        description: "The primary key for this table"
+      - name: data_05958_casesPerWeek
+        description: "The primary key for this table"
+      - name: data_05958_deathsPerWeek
+        description: "The primary key for this table"
+      - name: data_05958_stateAbbreviation
+        description: "The primary key for this table"
+      - name: data_05958_recovered
+        description: "The primary key for this table"
+      - name: data_05958_weekIncidence
+        description: "The primary key for this table"
+      - name: data_05958_casesPer100k
+        description: "The primary key for this table"
+      - name: data_05958_delta_cases
+        description: "The primary key for this table"
+      - name: data_05958_delta_deaths
+        description: "The primary key for this table"
+      - name: data_05958_delta_recovered
+        description: "The primary key for this table"
+      - name: data_05958_delta_weekIncidence
+        description: "The primary key for this table"
+      - name: meta_source
+        description: "The primary key for this table"
+      - name: meta_contact
+        description: "The primary key for this table"
+      - name: meta_info
+        description: "The primary key for this table"
+      - name: meta_lastUpdate
+        description: "The primary key for this table"
+      - name: meta_lastCheckedForUpdate
+        description: "The primary key for this table"

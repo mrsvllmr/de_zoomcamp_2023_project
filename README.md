@@ -153,6 +153,12 @@ The following instructions are deliberately very detailed. This is not only to e
     - If you want to: Start a Quick Run via UI <br>
       -> Afterwards you will now find a data directory and the ingested json file within your GCS bucket :white_check_mark:
 
+19. dbt-bigquery authentication methode
+    I used the service-account method by referencing the json file in the .gc folder. The result of the configuration via CLI is the profiles.yml file.<br>
+    When reproducing, this file must therefore be adjusted accordingly.
+
+20. 
+
 > wip - will be supplemented step by step; until then, this note remains in place
 
 <br>
@@ -245,3 +251,4 @@ Cloud Infrastructure
 # Next Steps
     - Docker (Compose) setup (isolation/containerization of Prefect, dbt etc.)
     - Spark
+    - Usage of multiple BigQuery datasets
