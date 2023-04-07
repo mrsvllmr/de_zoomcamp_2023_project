@@ -15,7 +15,13 @@ from prefect.filesystems import GCS
 from prefect.deployments import Deployment
 from prefect.server.schemas.schedules import CronSchedule
 
+home_dir = os.path.expanduser("~")
+project_dir = os.path.join(home_dir, "de_zoomcamp_2023_project", "prefect")
+sys.path.append(project_dir)
+import config as cfg
 
+
+###########################################################################################################################################
 @task(retries=3)
 def fetch(url: str) -> dict:
     """Extract RKI data"""
@@ -27,16 +33,18 @@ def fetch(url: str) -> dict:
 
     else:
         raise ValueError("Error retrieving data from API")
+###########################################################################################################################################
 
 
+###########################################################################################################################################
 @task(retries=3)
-def write_json_to_gcs(data: dict) -> None:
+def write_json_to_gcs(data: dict, topic: str) -> None:
     """Save data to GCS in JSON format"""
     # Convert the data to a JSON string
     json_data = json.dumps(data)
 
     # Define file/object name
-    filename = f"ingest_{datetime.datetime.now().strftime('%Y%m%d')}.json"
+    filename = f"ingest_{topic}_{datetime.datetime.now().strftime('%Y%m%d')}.json"
     object_name = f'{filename}'
 
     # Create a file-like object that contains the JSON string
@@ -44,11 +52,13 @@ def write_json_to_gcs(data: dict) -> None:
     file_obj = io.StringIO(json_data)
 
     # Upload the file to GCS
-    gcs_block = GcsBucket.load("gcs-bucket")
+    gcs_block = GcsBucket.load(cfg.configs["prefect_gcs_bucket_block"])
     gcs_block.upload_from_file_object(file_obj, object_name, content_type='application/json')
     return
+###########################################################################################################################################
 
 
+###########################################################################################################################################
 @flow()
 def rki_to_gcs() -> None:
     """Main flow responsible for extracting the data from the RKI api and writing them to GCS bucket"""
@@ -56,50 +66,59 @@ def rki_to_gcs() -> None:
     # activate logger in order to print manual/custom logs to Prefect flow logs
     logger = get_run_logger()
 
-    # API endpoint
-    url = "https://api.corona-zahlen.org/germany"
+    # API endpoints
+    endpoints = {
+        "germany": "https://api.corona-zahlen.org/germany",
+        "districts": "https://api.corona-zahlen.org/districts",
+        "hochsauerlandkreis": "https://api.corona-zahlen.org/districts/05958"
+    }
 
-    # Extract data from API
-    logger.info(
-        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-        f"Starting to extract the data from {url}\n"
-        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+    for key, value in endpoints.items():
+
+        # Extract data from API
+        logger.info(
+            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+            f"Starting to extract the data from {value}\n"
+            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+            )
+        data_dict = fetch(value)
+        logger.info(
+            f"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+            "Extracting of data completed\n"
+            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+            )
+
+        # Write data to GCS
+        logger.info(
+            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+            f"Starting to write json data to GCS bucket {value}\n"
+            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
         )
-    data_dict = fetch(url)
-    logger.info(
-        f"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-        "Extracting of data completed\n"
-        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-        )
-
-    # Write data to GCS
-    logger.info(
-        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-        f"Starting to write json data to GCS bucket {url}\n"
-        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+        write_json_to_gcs(data_dict, key, wait_for=data_dict)
+        logger.info(
+            f"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+            "Writing to GCS bucket completed\n"
+            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
     )
-    write_json_to_gcs(data_dict, wait_for=data_dict)
-    logger.info(
-        f"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-        "Writing to GCS bucket completed\n"
-        "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-    )
+###########################################################################################################################################
 
 
+###########################################################################################################################################
 def deploy_flow():
-    DEPLOY_STORE_NAME = "gcs-deployments"
-    storage = GCS.load("gcs-deployments")
+    DEPLOY_STORE_NAME = cfg.configs["DEPLOY_STORE_NAME"]
+    storage = GCS.load(DEPLOY_STORE_NAME)
     deployment = Deployment.build_from_flow(
         flow=rki_to_gcs,
         name='rki2gcs',
         description='Extracts data from RKI API in JSON format and writes them to the GCS bucket in JSON format',
-        version='20230405',
+        version='zoomcamp',
         work_queue_name='default',
         storage=storage,
         tags=["ingest"],
-        schedule=(CronSchedule(cron="0 0 8 * * *", timezone="Europe/Berlin")),
+        schedule=(CronSchedule(cron="0 0 10 * * *", timezone="Europe/Berlin")),
     )
     deployment.apply()
+###########################################################################################################################################
 
 
 if __name__ == "__main__":

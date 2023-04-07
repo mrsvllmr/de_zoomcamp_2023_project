@@ -125,7 +125,8 @@ The following instructions are deliberately very detailed. This is not only to e
     - Create a folder /home/{your_user}/.gc/ (reminder: your_user is defined via gce_ssh_user variable in variables.tf)
     - Save your sa-key-file.json within that directory (do not change the name!)
 
-14. Set an environment variable and activate the service account authentication <span style="color:green"> (on VM)</span>
+14. Set an environment variable and activate the service account authentication <span style="color:green"> (on VM)</span><br>
+    <span style="color:orange">Note: This step has to be repeated every time you open a new bash!</span><br>
     - Run ```cd de_zoomcamp_2023_project```
     - ```export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/sa-key-file.json```
     - ```gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS```
@@ -133,21 +134,22 @@ The following instructions are deliberately very detailed. This is not only to e
 15. Start the Prefect server: <span style="color:green"> (on VM)</span>
     - Activate conda virtual environment: ```source /home/mrsvllmr/anaconda3/bin/activate conda_venv```
     - Start the Prefect server: ```prefect server start```
+    - Start the Prefect work queue to be able to run flows via ```prefect agent start --pool default-agent-pool --work-queue default```
 
 16. Configure Prefect to communicate with the server <span style="color:green"> (on VM)</span>
     - Open another bash and activate the virtual environment once again (to keep the "server bash" open)
     - Run ```prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api```
 
-16. Register Prefect blocks via ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/blocks/gcp_blocks.py``` <span style="color:green"> (on VM)</span>
+16. Register Prefect blocks via ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/1_blocks/gcp_blocks.py``` <span style="color:green"> (on VM)</span>
     - Creates a GCP Credentials block called gcp-credentials (used to authenticate when interacting with GCP)
     - Creates a GCS block called gcp-deployments (used to save the deployments in GCP)
     - Creates a GCS Bucket block called gcs-bucket (used to save the data in GCS)
 
-17. Ingest the data (from RKI API to GCS) <span style="color:green"> (on VM)</span>
-    - Run ```python /home/mrsvllmr/de_zoomcamp_2023_project/ingestion/ingest.py```
+17. Deploy the processes<span style="color:green"> (on VM)</span>
+    - From RKI API to GCS: Run ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/2_ingestion/ingest.py```
+    - From GCS to GBQ: Run ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/3_gcs_to_gbq/gcs_to_gbq.py```
 
 18. Run a flow based on the newly created deployment <span style="color:green"> (on VM)</span>
-    - Start the Prefect work queue to be able to run flows via ```prefect agent start --pool default-agent-pool --work-queue default```
     - If you want to: Start a Quick Run via UI <br>
       -> Afterwards you will now find a data directory and the ingested json file within your GCS bucket :white_check_mark:
 
