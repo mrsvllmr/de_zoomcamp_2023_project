@@ -138,6 +138,9 @@ def write_bq(df, table_name) -> None:
         "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
     )
 
+    # Add column _inserted_at which is filled with the current timestamp
+    df["_inserted_at"] = pd.Timestamp.now(tz="Europe/Berlin")
+
     dataset_id = cfg.configs["dataset_id"] #'de_zoomcamp_2023_project_dataset'
     destination_table = f"{dataset_id}.{table_name}"
     gcp_credentials_block = GcpCredentials.load(cfg.configs["prefect_gcp_credentials_block"])
