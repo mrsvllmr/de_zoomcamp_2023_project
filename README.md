@@ -1,4 +1,5 @@
-# Data Engineering Zoomcamp 2023 - The harvest
+# Data Engineering Zoomcamp 2023 - (Hopefully) The harvest :blush:
+
 This repository is an image of my first end-to-end data engineering project at the end of de-zoomcamp 2023. <br>
 
 **Thank you very much to all who offer this well-structured and very practical and thus equally instructive course free of charge!** :raised_hands:
@@ -9,19 +10,29 @@ This repository is an image of my first end-to-end data engineering project at t
 
 <br>
 
-![](images\BallJames-overview-1920.jpg)
+<p align="left">
+<img src="corona.gif" width="200">
+</p>
 
 <br>
 
 # Problem statement
 
-This project combines my lifelong hobby and professional goal by sourcing, processing and visualising data from the world of football. Therefore I will make use of ```football-data.org```, the dev-friendly football API, which will provide me with the data needed to answer the following questions:
+Since this is not done enough nowadays, this project refers to Covid-19 data :stuck_out_tongue_winking_eye: Data source is the RKI (more precisely the API provided by Marlon Rückert here https://api.corona-zahlen.org/ - thanks again! :raised_hands:). <br>
+Finally, the following questions are answered: <br>
+:grey_question: In which areas is the proportion of corona-related deaths higher than the population proportion of the same region?<br>
+:grey_question: How does it differ with respect to the states?<br>
+:grey_question: Where is the proportion of deaths strikingly high?<br><br>
 
-- to be specified
-- ...
-- 
-- 
-- 
+Specifically, three different endpoints were implemented. Due to time constraints, the final dashboard does not refer to all three, however, adding more endpoints would be an easy task as the processing is already quite dynamic/parameterized.
+
+The following steps were implemented as part of the project:
+- Setting up the infrastructure largely via Terraform.
+- daily API retrieval of data in JSON format and saving in GCS/Datalake (Python/Pandas/Prefect).
+- daily transfer from GCS to BigQuery (Python/Pandas/Prefect)
+- daily processing/preparation of data (Python/Pandas/Prefect/dbt)
+- visualization of data in dashboard (Looker Studio)
+
 
 <br>
 <br>
@@ -41,6 +52,10 @@ The project is based on the following technologies (which are also used in the d
 <br>
 
 # My dashboard
+
+<p align="left">
+<img src="dez_2023_dashboard.gif" width="600">
+</p>
 
 <br>
 <br>
@@ -174,9 +189,18 @@ The following instructions are deliberately very detailed. This is not only to e
       ```
       <span style="color:red">When reproducing, this file must therefore be adjusted accordingly!</span>
 
-20. 
 
 > wip - will be supplemented step by step; until then, this note remains in place
+
+<br>
+<br>
+
+# Possible next steps
+    - Docker (Compose) setup (isolation/containerization of Prefect, dbt etc.)
+    - Usage of Spark
+    - Usage of multiple BigQuery datasets
+    - ...
+
 
 <br>
 <br>
@@ -208,64 +232,3 @@ Following steps had been excluded as it should already be done via Terraform (se
 
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
-
-<br>
-<br>
-
-# Prerequisites
-
-Since I actively followed the de-zoomcamp 2023, I already had a GCP Free Trial Account at the beginning of this project. In detail I beforehead
-- Created the account
-- Created a SSH key (to login to the VM instance)
-- Added the SSH key to Google Cloud (hereinafter referred to as "GC")
-- Created a VM instance
-- Connected Visual Studio Code to the VM
-- Configured the VM
-    - Installed Anaconda
-    - Created .config file to configure the SSH connection to the VM
-    - Installed Docker and Docker compose and downloaded the Docker image
-    - Installed PGCLI (Postgres command line tool)     
-    - Installed Terraform and applied Terraform Plan
-
-> This block is revised after it has been determined which steps are actually still carried out "manually". It is attempted to implement as much as possible code-based and thus easily reproducible. 
-
-<br>
-<br>
-
-# Steps towards implementation
-
-Signup Cloud Provider
-
-1. Created a new GCP project called ```de-zoomcamp-2023-project```
-2. Created a SSH key (will be used to connect to the virtual machine; for details see [GCP docs](https://cloud.google.com/compute/docs/connect/create-ssh-keys?hl=de))
-    - Created ```C:\Users\{...}\.ssh``` directory and switched to it in Git Bash
-    - Customized the command from the GC docs to create a private and a public key: ```ssh-keygen -t rsa -f ~/.ssh/gpc -C {...} -b 2048```
-    - Added the SSH public key to GC (GC Console -> Compute Engine -> Metadata -> SSH Keys)
-3. Connected to the VM via SSH and configured an easier access via config file and finally via Visual Studio Code directly
-
-Cloud Infrastructure
-
-4. Created a new VM instance (Linux/Ubuntu) called ```de-zoomcamp-2023-project-vm```
-5. Created GCP service account (for Terraform) and configured the VM to be able to connect (via GOOGLE_APPLICATION_CREDENTIALS environment variable)
-6. Enabled the GC APIs needed (Identity and Access Management (IAM), IAM Service Account Credentials)
-7. Configured IAM (for BigQuery Admin, Storage Admin and Storage Object Admin)
-
-'Inner' environment
-
-8. Installed Anaconda on the VM (/home/mrsvllmr/anaconda3)
-9. Installed docker.io and configured it with the needed permissions (by using [this](https://github.com/sindresorhus/guides/blob/main/docker-without-sudo.md))
-10. Installed Docker Compose
-11. Installed the modules needed (requests, dbt, prefect etc.)
-12. Installed Terraform (withinin Docker Compose)
-13. Configured the Terraform plan (for Cloud Storage Bucket and BiqQuery Dataset)
-14. Cloned my github repository to the VM
-
-> Final structure/representation of the steps not yet found - will be revised
-
----------------------------------------------------------------------------
----------------------------------------------------------------------------
-
-# Next Steps
-    - Docker (Compose) setup (isolation/containerization of Prefect, dbt etc.)
-    - Spark
-    - Usage of multiple BigQuery datasets

@@ -59,7 +59,7 @@ target_configs.save("bgtc", overwrite=True)
 # DbtCliProfile block
 ########################################################################################################
 dbt_cli_profile = DbtCliProfile(
-    name="dez-dbt-cli-profile",
+    name="dez_dbt",
     target="dev",
     target_configs=target_configs,
 )

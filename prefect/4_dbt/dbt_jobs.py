@@ -6,6 +6,7 @@ from prefect.filesystems import GCS
 from prefect.deployments import Deployment
 from prefect import flow, task, get_run_logger
 from prefect_dbt.cli.commands import trigger_dbt_cli_command
+from prefect_dbt.cli.commands import DbtCoreOperation, DbtCliProfile
 from prefect.server.schemas.schedules import CronSchedule
 
 home_dir = os.path.expanduser("~")
@@ -15,15 +16,39 @@ import config as cfg
 
 @flow(name="stg_districts", retries=3)
 def stg_districts() -> None:
-    result = trigger_dbt_cli_command("dbt run --select stg_districts")
+    # result = trigger_dbt_cli_command("dbt run --select stg_districts")
+
+    dbt_cli_profile = DbtCliProfile.load("dez-dbt-cli-profile")
+
+    result = DbtCoreOperation(
+        commands=["dbt run --select stg_districts"],
+        project_dir="~/de_zoomcamp_2023_project/dez_dbt/",
+        profiles_dir="~/de_zoomcamp_2023_project/",
+    ).run()
 
 @flow(name="br_districts", retries=3)
 def br_districts() -> None:
-    result = trigger_dbt_cli_command("dbt snapshot --select br_districts")
+    # result = trigger_dbt_cli_command("dbt snapshot --select br_districts")
+
+    dbt_cli_profile = DbtCliProfile.load("dez-dbt-cli-profile")
+
+    result = DbtCoreOperation(
+        commands=["dbt snapshot --select br_districts"],
+        project_dir="~/de_zoomcamp_2023_project/dez_dbt/",
+        profiles_dir="~/de_zoomcamp_2023_project/",
+    ).run()
 
 @flow(name="go_districts", retries=3)
 def go_districts() -> None:
-    result = trigger_dbt_cli_command("dbt run --select go_district")
+    # result = trigger_dbt_cli_command("dbt run --select go_district")
+    
+    dbt_cli_profile = DbtCliProfile.load("dez-dbt-cli-profile")
+
+    result = DbtCoreOperation(
+        commands=["dbt run --select go_districts"],
+        project_dir="~/de_zoomcamp_2023_project/dez_dbt/",
+        profiles_dir="~/de_zoomcamp_2023_project/",
+    ).run()
 
 
 ###########################################################################################################################################
@@ -47,7 +72,6 @@ def deploy_flow():
         flow=run_dbt,
         name='rundbt',
         description='Runs the defined dbt models',
-        path='dbt_deployments',
         version='zoomcamp',
         work_queue_name='default',
         storage=storage,
@@ -59,5 +83,5 @@ def deploy_flow():
 
 
 if __name__ == "__main__":
-    # etl_gcs_to_bq()
+    #run_dbt()
     deploy_flow()
