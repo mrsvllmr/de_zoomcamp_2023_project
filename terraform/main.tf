@@ -22,7 +22,7 @@ resource "google_compute_instance" "instance" {
     }
   }
 
-  service_accounts {
+  service_account {
     email = google_service_account.de-zoomcamp-2023-project-sa-id.email
     scopes = ["cloud-platform"]
   }
