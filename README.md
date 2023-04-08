@@ -18,7 +18,7 @@ This repository is an image of my first end-to-end data engineering project at t
 # Problem statement
 
 Since this is not done enough nowadays, this project refers to Covid-19 data :stuck_out_tongue_winking_eye: Data source is the RKI (more precisely the API provided by Marlon Rückert here https://api.corona-zahlen.org/ - thanks again! :raised_hands:). <br>
-Finally, the following questions are answered: <br>
+Finally, the following questions are answered:<br>
 :grey_question: In which areas is the proportion of corona-related deaths higher than the population proportion of the same region?<br>
 :grey_question: How does it differ with respect to the states?<br>
 :grey_question: Where is the proportion of deaths strikingly high?<br><br>
@@ -26,10 +26,10 @@ Finally, the following questions are answered: <br>
 Specifically, three different endpoints were implemented. Due to time constraints, the final dashboard does not refer to all three, however, adding more endpoints would be an easy task as the processing is already quite dynamic/parameterized.
 
 The following steps were implemented as part of the project:
-- Setting up the infrastructure largely via Terraform.
-- daily API retrieval of data in JSON format and saving in GCS/Datalake (Python/Pandas/Prefect).
-- daily transfer from GCS to BigQuery (Python/Pandas/Prefect)
-- daily processing/preparation of data (Python/Pandas/Prefect/dbt)
+- Setting up the infrastructure largely via Terraform
+- Daily API retrieval of data in JSON format and saving in GCS/Datalake (Python/Pandas orchestrated by Prefect)
+- Daily flatten and transfer from GCS to BigQuery (Python/Pandas orchestrated by Prefect)
+- Daily processing/preparation of data (staging/bronze/silver/gold layer via dbt orchestrated by Prefect)
 - visualization of data in dashboard (Looker Studio)
 
 
@@ -39,7 +39,7 @@ The following steps were implemented as part of the project:
 # Technologies
 
 The project is based on the following technologies (which are also used in the de-zoomcamp 2023, in case you happen to find out about it here and would like to take a look at the extensive material):
-- **Cloud platform** (Virtual Machine, Storage/Datalake, Warehouse, Visualization): GCP
+- **Cloud platform** (Service Account/IAM, Virtual Machine, Storage/Datalake, Warehouse, Visualization): GCP
 - **Infrastructure as code (IaC)**: Terraform
 - **Batch processing**: Python/Pandas
 - **Data warehouse**: Google Big Query
@@ -67,7 +67,7 @@ The following instructions are deliberately very detailed. This is not only to e
     - ```git clone https://github.com/mrsvllmr/de_zoomcamp_2023_project.git```
 
 2. Create a GCP account and a project (via GCP UI) <br>
-    -> GCP is used as it offers a 300$ 90 days trial; GCP will be used for storage/warehouse and visualization
+    -> GCP is used as it offers a 300$ 90 days trial and, as already touched upon, provides an entire platform
 
 3. Install Terraform (locally) (https://developer.hashicorp.com/terraform/downloads; download, unpack, set path variable) <span style="color:green"> (on your local machine)</span> <br>
     -> Terraform will be used to create resources on GCP via code (advantages are among others maintainability/versioning)
@@ -142,8 +142,10 @@ The following instructions are deliberately very detailed. This is not only to e
 14. Set an environment variable and activate the service account authentication <span style="color:green"> (on VM)</span><br>
     <span style="color:orange">Note: This step has to be repeated every time you open a new bash!</span><br>
     - Run ```cd de_zoomcamp_2023_project```
-    - ```export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/sa-key-file.json```
-    - ```gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS```
+    - ```export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/sa-key-file.json```<br>
+      or ```set GOOGLE_APPLICATION_CREDENTIALS=~/.gc/sa-key-file.json``` (Windows)
+    - ```gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS``` (Linux)<br>
+      or ```gcloud auth activate-service-account --key-file %GOOGLE_APPLICATION_CREDENTIALS%``` (Windows)
 
 15. Start the Prefect server: <span style="color:green"> (on VM)</span>
     - Activate conda virtual environment: ```source /home/mrsvllmr/anaconda3/bin/activate conda_venv```
@@ -195,14 +197,23 @@ The following instructions are deliberately very detailed. This is not only to e
 <br>
 
 # Possible next steps
+    - Further optimization/simplification of reproducibility
     - Docker (Compose) setup (isolation/containerization of Prefect, dbt etc.)
-    - Usage of Spark
-    - Usage of multiple BigQuery datasets
-    - ...
-
+    - Use Spark
+    - Use multiple BigQuery datasets
+    - CI/CD Pipeline
+    - Test mechanisms during the individual steps
+    - Use make
 
 <br>
 <br>
+
+# If you are interested, the following screenshots will give you more insight:
+
+- [GCP](more_insights/gcp_screenshots.md)
+- [dbt](more_insights/dbt_screenshots.md)
+- [Prefect](more_insights/prefect_screenshots.md)
+
 
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
@@ -217,17 +228,7 @@ Following steps had been excluded as it should already be done via Terraform (se
     - ```gcloud iam service-accounts keys create ../.gc/sa-iam.json --iam-account=sa-iam@{your_project_id}.iam.gserviceaccount.com``` (Linux)
     - ```gcloud iam service-accounts keys create C:\Users\WINDOWS_USER\.gc\sa-iam.json --iam-account=sa-iam@{your_project_id}.iam.gserviceaccount.com``` (Windows)
 
-8. Set GOOGLE_APPLICATION_CREDENTIALS environment variable:
-    - Run one of the following commands (depending on your os)
-        - ```export GOOGLE_APPLICATION_CREDENTIALS="<path/to/your/service-account-authkeys>.json"``` (Linux)
-        - ```set GOOGLE_APPLICATION_CREDENTIALS="<path/to/your/service-account-authkeys>.json"``` (Windows)
-
-9. Activate Service Account Credentials: 
-    - Run one of the following commands (depending on your os)
-        - ```gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS``` (Linux)
-        - ```gcloud auth activate-service-account --key-file %GOOGLE_APPLICATION_CREDENTIALS%``` (Windows)
-        or
-        - ```gcloud auth application-default login```
+> wip - will be checked during the final tests whether these steps are still necessary
 
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------

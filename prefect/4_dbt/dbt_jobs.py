@@ -52,7 +52,7 @@ def go_districts() -> None:
 
 
 ###########################################################################################################################################
-@flow(name="Run dbt!", retries=3)
+@flow(name="within-gbq", retries=3)
 def run_dbt() -> None:
     """Updates defined dbt models and snapshots"""
     run_1 = stg_districts()
@@ -70,7 +70,7 @@ def deploy_flow():
     storage = GCS.load(DEPLOY_STORE_NAME)
     deployment = Deployment.build_from_flow(
         flow=run_dbt,
-        name='rundbt',
+        name='dbt',
         description='Runs the defined dbt models',
         version='zoomcamp',
         work_queue_name='default',

@@ -215,7 +215,7 @@ def write_bq(df, table_name) -> None:
 
 
 ###########################################################################################################################################
-@flow(name="Main etlGCSToBQ", retries=3)
+@flow(name="gcs-to-gbq", retries=3)
 def etl_gcs_to_bq() -> None:
     """Main ETL flow to load data into Big Query"""
 
