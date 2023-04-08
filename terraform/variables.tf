@@ -39,7 +39,7 @@ variable "BQ_DATASET" {
 
 variable "instance" {
   type = string
-  default = "de-zoomcamp-2023-project-vm-sshtest"
+  default = "de-zoomcamp-2023-project-vm"
 }
 
 variable "machine_type" {

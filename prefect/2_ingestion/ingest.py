@@ -5,6 +5,7 @@ import pyarrow.parquet as pq
 import json
 import os
 import io
+import sys
 import datetime
 import logging
 import gcsfs
