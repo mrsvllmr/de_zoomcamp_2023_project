@@ -11,7 +11,7 @@ This repository is an image of my first end-to-end data engineering project at t
 <br>
 
 <p align="left">
-<img src="corona.gif" width="200">
+<img src="images/corona.gif" width="200">
 </p>
 
 <br>
@@ -54,7 +54,7 @@ The project is based on the following technologies (which are also used in the d
 # My dashboard
 
 <p align="left">
-<img src="dez_2023_dashboard.gif" width="600">
+<img src="images/dez_2023_dashboard.gif" width="600">
 </p>
 
 <br>
