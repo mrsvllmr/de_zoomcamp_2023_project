@@ -22,6 +22,11 @@ resource "google_compute_instance" "instance" {
     }
   }
 
+  service_accounts {
+    email = google_service_account.de-zoomcamp-2023-project-sa-id.email
+    scopes = ["cloud-platform"]
+  }
+
   metadata = {
     sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
   }
