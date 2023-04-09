@@ -67,6 +67,8 @@ https://lookerstudio.google.com/reporting/d4ca7158-28ab-46ea-aa95-f68c201a78df
 
 The following instructions are deliberately very detailed. This is not only to ensure functional/reproducibility, but also a comprehensive understanding through explanations and, in part, possible alternatives to individual steps.
 
+Note in advance: I have tried to describe the reproduction in as much detail as possible. To keep it concrete, you can mostly see the commands, paths, etc. that I actually used. In addition, in hopefully all cases there is the hint that things like the Windows user, the GCP project ID etc. have to be adjusted. This should be self-evident, but for safety's sake at this point again the reminder :)
+
 1. Clone repository <span style="color:green"> (on your local machine)</span>
     - ```git clone https://github.com/mrsvllmr/de_zoomcamp_2023_project.git```
 
@@ -166,21 +168,23 @@ The following instructions are deliberately very detailed. This is not only to e
     - Activate conda virtual environment: ```source /home/mrsvllmr/anaconda3/bin/activate conda_venv```
     - ```prefect agent start --pool default-agent-pool --work-queue default```
 
-16. Configure Prefect to communicate with the server <span style="color:green"> (on VM)</span>
+17. Configure Prefect to communicate with the server <span style="color:green"> (on VM)</span>
     - Open another terminal and activate the virtual environment once again (to keep the "server bash" open) via ```source /home/mrsvllmr/anaconda3/bin/activate conda_venv```
     - Run ```prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api```
 
-16. Register Prefect blocks via ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/1_blocks/gcp_blocks.py``` <span style="color:green"> (on VM)</span>
+18. Set the variables in the config.py file within the prefect directory (especially project_id; the rest only if necessary, if you have already made renaming or the like in advance)
+
+19. Register Prefect blocks via ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/1_blocks/gcp_blocks.py``` <span style="color:green"> (on VM)</span>
     - Creates a GCP Credentials block called gcp-credentials (used to authenticate when interacting with GCP)
     - Creates a GCS block called gcp-deployments (used to save the deployments in GCP)
     - Creates a GCS Bucket block called gcs-bucket (used to save the data in GCS)
 
-17. Deploy the processes<span style="color:green"> (on VM)</span>
+20. Deploy the processes<span style="color:green"> (on VM)</span>
     - ```cd C:\Users\mariu\source\repos\de_zoomcamp_2023_project```
     - From RKI API to GCS: Run ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/2_ingestion/ingest.py```
     - From GCS to GBQ: Run ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/3_gcs_to_gbq/gcs_to_gbq.py```
 
-18. Initialize dbt project
+21. Initialize dbt project
     - When I ran ```dbt init``` I used the service-account method by referencing the json file in the .gc folder. The result of the configuration via CLI is the profiles.yml file. I saved it within the dez_dbt project folder. This facilitates the accessibility of the file and is not critical, since the credentials are still not visible in plain text via the keyfile reference.<br>
     - Fyi, my profiles.yml looks like this:
       ```yml
@@ -201,10 +205,10 @@ The following instructions are deliberately very detailed. This is not only to e
       ```
       <span style="color:red">When reproducing, this file must therefore be adjusted accordingly with regards to the keyfile/user within the path and the project!</span>
 
-19. Deploy the dbt jobs/flows via ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/4_dbt/dbt_jobs.py```
+22. Deploy the dbt jobs/flows via ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/4_dbt/dbt_jobs.py```
     - Details regarding the dbt implementations can be of course found within the models and snapshots and in "more_insights/dbt_screenshots.md".
 
-20. Install the dbt packages
+23. Install the dbt packages
     - ```cd /home/mrsvllmr/de_zoomcamp_2023_project/dez_dbt```
     - ```dbt deps```
 
