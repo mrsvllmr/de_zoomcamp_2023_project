@@ -51,9 +51,14 @@ The project is based on the following technologies (which are also used in the d
 
 # My dashboard
 
+As you can easily see, my focus was not on the dashboard creation, but rather on the provision of the entire infrastructure and the development of the processes for data processing. Nevertheless, this dashboard provides the answers to the above questions.
+
 <p align="left">
 <img src="images/dez_2023_dashboard.gif" width="800">
 </p>
+
+Note regarding the review: The dashboard can be viewed here:<br>
+https://lookerstudio.google.com/reporting/d4ca7158-28ab-46ea-aa95-f68c201a78df
 
 <br>
 <br>
