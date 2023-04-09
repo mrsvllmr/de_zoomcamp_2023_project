@@ -65,7 +65,7 @@ variable "roles" {
   default     = ["roles/owner","roles/storage.admin","roles/storage.objectAdmin","roles/bigquery.admin"]
 }
 
-variable "github_pat" {
-  type        = string
-  default     = "C:/Users/mariu/.github/pat" # adjust accordingly!
-}
+# variable "github_pat" {
+#   type        = string
+#   default     = "C:/Users/mariu/.github/pat" # adjust accordingly!
+# }

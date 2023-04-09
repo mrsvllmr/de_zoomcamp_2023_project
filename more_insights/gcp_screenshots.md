@@ -1,4 +1,4 @@
-## Einblick in den Google Cloud Storage Bucket. Hier liegen die Rohdaten aus der API im JSON Format. Zur einfacheren Verarbeitung/Identifikation enthält der Dateiname das Thema/die Tabelle und das Extraktionsdatum.
+## Insight into the Google Cloud Storage Bucket. This is where the raw data from the API resides in JSON format. For easier processing/identification, the file name contains the topic/table and the extraction date.
 
 ![](../images/gcp_cloudstorage_bucket.png)
 
