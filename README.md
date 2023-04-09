@@ -223,7 +223,7 @@ Now everything should be ready. The processes and their deployments are now read
 <br>
 <br>
 
-# If you are interested, the following screenshots will give you more insight:
+# If you are interested, the following screenshots and descriptions will give you more insights:
 
 - [GCP](more_insights/gcp_screenshots.md)
 - [dbt](more_insights/dbt_screenshots.md)
