@@ -198,7 +198,7 @@ The following instructions are deliberately very detailed. This is not only to e
       <span style="color:red">When reproducing, this file must therefore be adjusted accordingly with regards to the keyfile/user within the path and the project!</span>
 
 19. Deploy the dbt jobs/flows via ```python /home/mrsvllmr/de_zoomcamp_2023_project/prefect/4_dbt/dbt_jobs.py```
-    - Details regarding the dbt implementations can be of course found within the models and snapshots and in "more_insights/dbt_screenshots.md". 
+    - Details regarding the dbt implementations can be of course found within the models and snapshots and in "more_insights/dbt_screenshots.md".
 
 20. Install the dbt packages
     - ```cd /home/mrsvllmr/de_zoomcamp_2023_project/dez_dbt```

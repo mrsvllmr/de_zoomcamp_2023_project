@@ -9,6 +9,12 @@
     strategy='check',
     check_cols=['name', 'county', 'population', 'cases', 'deaths', 'casesPerWeek', 'deathsPerWeek', 'stateAbbreviation', 'recovered', 'weekIncidence', 'casesPer100k', 'delta_cases', 'delta_deaths', 'delta_recovered', 'delta_weekIncidence'],
     unique_key='allgemeiner_gemeinde_schluessel',
+
+    partition_by={
+        "field": "dbt_updated_at",
+        "data_type": "timestamp",
+        "granularity": "day"
+    }
 ) }}
 
 /* 
