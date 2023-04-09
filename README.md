@@ -1,5 +1,4 @@
-# Data Engineering Zoomcamp 2023<br>
-# (Hopefully) The harvest :blush:
+# Data Engineering Zoomcamp 2023 - Course project<br>
 
 This repository is an image of my first end-to-end data engineering project at the end of de-zoomcamp 2023. <br>
 
